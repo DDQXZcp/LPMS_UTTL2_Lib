@@ -24,7 +24,12 @@ struct position {
     float y;
     float w;
 };
-
+///Add this in original library
+struct Vector {
+    float x;
+    float y;
+    float z;
+};
 enum Command {noAction, homing, readyPosition, fire, VESC, toggleVG};
 
 struct pointInfo

@@ -13,23 +13,23 @@ class LPMS : public Serial {
         float encoder2local_angle;
         float encoder_position_angle;//90 +  angle to encoder location
         float r;//encoder to center radius*/
-        Timer actionTimeout;
+        Timer LPMSTimeout;
         union {
             int8_t data[56];
             float valF[14];
         } posture;
         int LPMS_counter;
-        int i;
+        float Time,Time_L//TimeStamp
         struct position tempPos, degreePos, aeReadPos, startOffset, curPos;//For actionEncoder
-        struct Gyroscope,Accelerometer,Magnetometer,Quaternion;
-        int LastRead;
+        struct Vector Velocity, AngularV;
+        struct Vector Gyroscope,Accelerometer,Magnetometer,Quaternion;
+        struct Vector Gyroscope_L,Accelerometer_L,Magnetometer_L,Quaternion_L;
         bool newDataArrived;
-        char buffer[8];
-        
+        float dt;
     public:
         LPMS(PinName tx, PinName rx);
         bool translate(char c);
-        void calculatePos(float GX, float GY, float gZ, float AX, float AY, float AZ, bool start = false);
+        void calculatePos(float time, float GX, float GY, float gZ, float AX, float AY, float AZ, bool start = false);
         bool curPosIsAvailable();
         struct position getCurPos();
         float getR();

@@ -4,13 +4,11 @@ LPMS::LPMS(PinName tx, PinName rx) : Serial(tx, rx, 115200)
 {
     format(8, SerialBase::None, 1);
     LPMS_counter = 0;
-    i = 0;
-    LastRead = 0;
     newDataArrived = false;
 
     actionTimeout.start(); //This is for the LPMS timeout, lest trapped in infinite loop/ cannot read char.
     //POTENTIAL BUG HERE. USE TIMER (MBED) FOR TIMEOUT TO ESCAPE LOOP.
-    while (actionTimeout.read_ms() < 5000) //Wait for 5 seconds to check if it receives all information.
+    while (LPMSTimeout.read_ms() < 5000) //Wait for 5 seconds to check if it receives all information.
     {
         if (readable())
         {
@@ -85,6 +83,7 @@ bool LPMS::translate(char c)//The pc.putc is for debug use
         //pc.printf("\nAccelerometer: '%f','%f','%f'",posture.valF[4],posture.valF[5],posture.valF[6]);
         //pc.printf("\nMagnetometer: '%f','%f','%f'",posture.valF[7],posture.valF[8],posture.valF[9]);
         //pc.printf("\nQuaternion: '%f','%f','%f'",posture.valF[10],posture.valF[11],posture.valF[12]);
+        Time = posture.valF[0];
         Gyroscope.x = posture.valF[1];
         Gyroscope.y = posture.valF[2];
         Gyroscope.z = posture.valF[3];
@@ -105,71 +104,8 @@ bool LPMS::translate(char c)//The pc.putc is for debug use
         break;
         }
     return false;
-    /////////////
-    /*switch (LPMS_counter)
-    {
-    case 0:
-        if (c == 0x0d)
-            LPMS_counter++;
-        else
-            LPMS_counter = 0;
-        break;
-    case 1:
-        if (c == 0x0a)
-        {
-            i = 0;
-            LPMS_counter++;
-        }
-        else if (c == 0x0d)
-        {
-        }
-        else
-            LPMS_counter = 0;
-        break;
-    case 2:
-        posture.data[i] = c;
-        i++;
-        if (i >= 24)
-        {
-            i = 0;
-            LPMS_counter++;
-        }
-        break;
-    case 3:
-        if (c == 0x0a)
-            LPMS_counter++;
-        else
-            LPMS_counter = 0;
-        break;
-    case 4:
-        if (c == 0x0d)
-        {
-            degreePos.w = posture.val[0] - tempPos.w;
-            if (degreePos.w < -180)
-            {
-                degreePos.w = degreePos.w + 360;
-            }
-            else if (degreePos.w > 180)
-            {
-                degreePos.w = degreePos.w - 360;
-            }
-            aeReadPos.w += degreePos.w;
-            tempPos.w = posture.val[0];
-            aeReadPos.x = posture.val[3];
-            aeReadPos.y = posture.val[4];
-            newDataArrived = true;
-        }
-        LPMS_counter = 0;
-        return true;
-        //break;
-    default:
-        LPMS_counter = 0;
-        break;
-    }
-    return false;
-}*/
 
-void LPMS::calculatePos(float GX, float GY, float gZ, float AX, float AY, float AZ, bool start)
+void LPMS::calculatePos(float time, float GX, float GY, float gZ, float AX, float AY, float AZ, bool start)
 {
     if (start)
     {
@@ -180,14 +116,19 @@ void LPMS::calculatePos(float GX, float GY, float gZ, float AX, float AY, float 
         //startOffset.y = ty - x_tbias ;  //+
         startOffset.w = _A * pi / float(180); //degree 2 rad
         */
+        Time_L = time;
     }
     else
     {
+        dt = time - Time_L;
+        Time_L = time;
+        Velocity.x = Velocity.x + AX;
+        /*
         curPos.x = tx + y_tbias - startOffset.x; //-
         curPos.y = ty - x_tbias - startOffset.y;
         //curPos.x = tx + y_tbias   - startOffset.x;  //+
         //curPos.y = ty - x_tbias   - startOffset.y;
-        curPos.w = _A * pi / float(180) - startOffset.w;
+        curPos.w = _A * pi / float(180) - startOffset.w;*/
     }
 }
 
