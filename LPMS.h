@@ -22,8 +22,10 @@ class LPMS : public Serial {
         float Time,Time_L//TimeStamp
         struct position tempPos, degreePos, aeReadPos, startOffset, curPos;//For actionEncoder
         struct Vector Velocity, AngularV;
-        struct Vector Gyroscope,Accelerometer,Magnetometer,Quaternion;
-        struct Vector Gyroscope_L,Accelerometer_L,Magnetometer_L,Quaternion_L;
+        struct Vector Gyroscope,Accelerometer,Magnetometer;
+        struct Vector Gyroscope_L,Accelerometer_L,Magnetometer_L;
+        struct Quad Quaternion;
+        struct rotate;//x,y,z is pitch, yaw, roll angle respectively
         bool newDataArrived;
         float dt;
     public:

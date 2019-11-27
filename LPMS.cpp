@@ -93,9 +93,10 @@ bool LPMS::translate(char c)//The pc.putc is for debug use
         Magnetometer.x = posture.valF[7];
         Magnetometer.y = posture.valF[8];
         Magnetometer.z = posture.valF[9];
-        Quaternion.x = posture.valF[10];
-        Quaternion.y = posture.valF[10];
-        Quaternion.z = posture.valF[11];
+        Quaternion.q0 = posture.valF[10];
+        Quaternion.q1 = posture.valF[11];
+        Quaternion.q2 = posture.valF[12];
+        Quaternion.q3 = posture.valF[13];
         newDataArrived = true;
         LPMS_counter = 0;
         return true;
@@ -109,6 +110,7 @@ void LPMS::calculatePos(float time, float GX, float GY, float gZ, float AX, floa
 {
     if (start)
     {
+        //Need to add offset for imu later, gryoscope may be enough
         /*
         startOffset.x = tx + y_tbias; //-
         startOffset.y = ty - x_tbias;
@@ -123,6 +125,7 @@ void LPMS::calculatePos(float time, float GX, float GY, float gZ, float AX, floa
         dt = time - Time_L;
         Time_L = time;
         Velocity.x = Velocity.x + AX;
+        pitch = pitch + Gyroscope.x;
         /*
         curPos.x = tx + y_tbias - startOffset.x; //-
         curPos.y = ty - x_tbias - startOffset.y;

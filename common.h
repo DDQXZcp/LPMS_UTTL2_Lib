@@ -30,6 +30,12 @@ struct Vector {
     float y;
     float z;
 };
+struct Quad {
+    float q0;
+    float q1;
+    float q2;
+    float q3;
+};
 enum Command {noAction, homing, readyPosition, fire, VESC, toggleVG};
 
 struct pointInfo
